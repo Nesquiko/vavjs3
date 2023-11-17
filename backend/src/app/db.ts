@@ -10,6 +10,14 @@ create table if not exists user_account (
 );
 `;
 
+const INIT_TOKEN_SQL = `
+create table if not exists user_token (
+	id uuid primary key,
+	user_id uuid not null references user_account(id),
+	expiration_date date not null
+);
+`;
+
 const INIT_RIDE_TYPE_SQL = `
 create table if not exists ride_type (
 	id uuid primary key,
@@ -44,6 +52,7 @@ create table if not exists ad (
 export async function initDb(pool: Pool) {
   let client = await pool.connect();
   client.query(INIT_USER_SQL);
+  client.query(INIT_TOKEN_SQL);
   client.query(INIT_RIDE_TYPE_SQL);
   client.query(INIT_ROUTE_SQL);
   client.query(INIT_DURATION_SQL);

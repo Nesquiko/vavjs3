@@ -1,6 +1,10 @@
 import { Pool } from 'pg';
 import { initDb } from './app/db';
 import { serverStart } from './app/endpoints';
+import dotenv from 'dotenv';
+
+const ENV_FILE = '.env.local';
+dotenv.config({ path: ENV_FILE });
 
 const pool = new Pool({
   host: process.env.DB_HOST,

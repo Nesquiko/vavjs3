@@ -66,14 +66,12 @@ export async function registerUser(
 export async function loginUser(
   pool: Pool,
   login: LoginRequest,
-): Promise<User> {
-  console.log('login', login);
+): Promise<[User, string]> {
   let result = await pool.query('select * from user_account where email = $1', [
     login.email,
   ]);
 
   if (result.rows.length === 0) {
-    console.log('did not find user');
     throw new Error('Invalid email or password');
   }
 
@@ -86,8 +84,32 @@ export async function loginUser(
   );
   let match = await bcrypt.compare(login.password, user.passwordHash);
   if (!match) {
-    console.log('passwords did not match');
     throw new Error('Invalid email or password');
   }
-  return user;
+
+  let token = await pool.query(
+    "insert into user_token (id, user_id, expiration_date) values (gen_random_uuid(), $1, now() + interval '1 day') returning *",
+    [user.id],
+  );
+
+  return [user, token.rows[0].id];
+}
+
+export async function loginWithToken(pool: Pool, token: string): Promise<User> {
+  let result = await pool.query(
+    'select * from user_account where id = (select user_id from user_token where id = $1)',
+    [token],
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Invalid token');
+  }
+
+  return new User(
+    result.rows[0].id,
+    result.rows[0].email,
+    result.rows[0].passwordhash,
+    result.rows[0].name,
+    result.rows[0].age,
+  );
 }

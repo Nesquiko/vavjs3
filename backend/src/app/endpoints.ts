@@ -1,12 +1,22 @@
 import { Request } from 'express';
 import express from 'express';
 import morgan from 'morgan';
-import { LoginRequest, NewUserRequest, loginUser, registerUser } from './user';
+import {
+  LoginRequest,
+  NewUserRequest,
+  loginUser,
+  loginWithToken,
+  registerUser,
+} from './user';
 import { Pool } from 'pg';
+import cookieParser from 'cookie-parser';
+
+const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
 let pool: Pool;
 const app = express();
 app.use(morgan('tiny'));
+app.use(cookieParser());
 app.use(express.json());
 
 app.post(
@@ -23,7 +33,23 @@ app.post(
 
 app.post('/user/login', async (req: Request<{}, {}, LoginRequest>, res) => {
   try {
-    let user = await loginUser(pool, req.body);
+    let [user, token] = await loginUser(pool, req.body);
+    res
+      .cookie('sessionToken', token, {
+        maxAge: USER_SESSION_AGE,
+        httpOnly: true,
+      })
+      .status(200)
+      .json(user);
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.get('/user/login/token', async (req, res) => {
+  try {
+    let token = req.cookies['sessionToken'];
+    let user = await loginWithToken(pool, token);
     res.status(200).json(user);
   } catch (e) {
     res.status(401).json({ error: e.message });
