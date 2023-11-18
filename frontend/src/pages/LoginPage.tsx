@@ -34,17 +34,15 @@ export const LoginPage = ({ setUser }: LoginPageProps) => {
       });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    handleLogin();
-  };
-
   // inspired by https://flowbite.com/blocks/marketing/login/
   return (
     <div className="min-h-screen flex items-center justify-center">
       <form
         className="bg-white shadow-md rounded border px-8 pt-6 pb-8 mb-4"
-        onSubmit={handleSubmit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleLogin();
+        }}
       >
         <h2 className="text-2xl font-bold mb-6">Login</h2>
         {errorMessage && (
@@ -58,7 +56,7 @@ export const LoginPage = ({ setUser }: LoginPageProps) => {
             Email
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
             id="email"
             type="text"
             placeholder="Email"
@@ -75,7 +73,7 @@ export const LoginPage = ({ setUser }: LoginPageProps) => {
             Password
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
             id="password"
             type="password"
             placeholder="Password"
@@ -86,13 +84,13 @@ export const LoginPage = ({ setUser }: LoginPageProps) => {
         </div>
         <div className="flex items-center justify-between">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="w-24 bg-blue-500 border-2 border-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             type="submit"
           >
             Login
           </button>
           <Link to="/register">
-            <button className="border-2 border-slate-500 text-slate-500 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-4">
+            <button className="w-24 border-2 border-blue-500 text-blue-500 font-bold py-2 px-4 rounded">
               Register
             </button>
           </Link>

@@ -13,6 +13,7 @@ import { RegistrationPage } from './pages/RegistrationPage.tsx';
 import { HomePage } from './pages/HomePage.tsx';
 import { ProtectedRoute } from './pages/ProtectedRoute';
 import { User } from './model.ts';
+import { AdminPage } from './pages/AdminPage.tsx';
 
 const Root = () => {
   const [user, setUser] = useState<User | undefined>(undefined);
@@ -49,8 +50,16 @@ const Root = () => {
       <Route
         path="/home"
         element={
-          <ProtectedRoute user={user}>
-            <HomePage />
+          <ProtectedRoute user={user} checkAdmin={false}>
+            <HomePage user={user!} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute user={user} checkAdmin={true}>
+            <AdminPage />
           </ProtectedRoute>
         }
       />
