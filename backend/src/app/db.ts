@@ -52,6 +52,10 @@ create table if not exists ad (
 	link text not null,
 	counter int not null
 );
+
+insert into ad (id, image_url, link, counter) values
+('38469554-300f-4a04-b231-0b209f2ecfda', 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.alza.sk%2Fsplatky&psig=AOvVaw2lF4tG3MOnQF84ShsLiG3Z&ust=1700415725897000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCLCipqyMzoIDFQAAAAAdAAAAABAE', 'https://www.alza.sk', 0)
+on conflict do nothing;
 `;
 
 export async function initDb(pool: Pool) {

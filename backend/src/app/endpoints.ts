@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import {
   LoginRequest,
   NewUserRequest,
+  checkIfTokenLoggedIn,
   loginUser,
   loginWithToken,
   registerUser,
@@ -12,6 +13,7 @@ import { Pool } from 'pg';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { deleteUser, exportUsers, getAllUsers, importUsers } from './admin';
+import { getAd, incrementAdCounter } from './ad';
 
 const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
@@ -111,12 +113,37 @@ app.post('/admin/user/import', async (req, res) => {
   }
 });
 
+app.get('/ad', async (req, res) => {
+  try {
+    await checkIfLoggedIn(pool, req.cookies['sessionToken']);
+    let ad = await getAd(pool);
+    res.status(200).json(ad);
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.put('/ad/:id', async (req, res) => {
+  try {
+    await incrementAdCounter(pool, req.params.id);
+  } catch (e) {
+    res.status(500).end();
+  }
+});
+
 async function checkIfAdmin(pool: Pool, token: string) {
   let user = await loginWithToken(pool, token);
   if (user.name !== 'admin') {
     throw new Error('Unauthorized');
   }
   return user;
+}
+
+async function checkIfLoggedIn(pool: Pool, token: string) {
+  let loggedIn = await checkIfTokenLoggedIn(pool, token);
+  if (!loggedIn) {
+    throw new Error('Unauthorized');
+  }
 }
 
 export function serverStart(_pool: Pool, port: number) {

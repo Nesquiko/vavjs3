@@ -96,7 +96,7 @@ export async function loginUser(
 
 export async function loginWithToken(pool: Pool, token: string): Promise<User> {
   let result = await pool.query(
-    'select * from user_account where id = (select user_id from user_token where id = $1)',
+    'select * from user_account where id = (select user_id from user_token where id = $1 and expiration_date >= current_timestamp)',
     [token],
   );
 
@@ -111,4 +111,16 @@ export async function loginWithToken(pool: Pool, token: string): Promise<User> {
     result.rows[0].name,
     result.rows[0].age,
   );
+}
+
+export async function checkIfTokenLoggedIn(
+  pool: Pool,
+  token: string,
+): Promise<boolean> {
+  let result = await pool.query(
+    'select * from user_account where id = (select user_id from user_token where id = $1 and expiration_date >= current_timestamp)',
+    [token],
+  );
+
+  return result.rows.length !== 0;
 }
