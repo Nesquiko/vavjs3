@@ -12,11 +12,15 @@ import { LoginPage } from './pages/LoginPage.tsx';
 import { RegistrationPage } from './pages/RegistrationPage.tsx';
 import { HomePage } from './pages/HomePage.tsx';
 import { ProtectedRoute } from './pages/ProtectedRoute';
-import { User } from './model.ts';
+import { Ad, User } from './model.ts';
 import { AdminPage } from './pages/AdminPage.tsx';
+import { AnnoyingAd } from './pages/AnnoyingAd.tsx';
+
+const AD_SHOW_AFTER_SECS = 60;
 
 const Root = () => {
   const [user, setUser] = useState<User | undefined>(undefined);
+  const [ad, setAd] = useState<Ad | undefined>(undefined);
   const navigation = useNavigate();
 
   useEffect(() => {
@@ -42,28 +46,53 @@ const Root = () => {
     fetchUserWithToken();
   }, []);
 
+  useEffect(() => {
+    async function fetAd() {
+      await fetch(import.meta.env.VITE_BACKEND_URL + '/ad', {
+        credentials: 'include',
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Failed to fetch ad');
+          }
+        })
+        .then((ad) => {
+          setAd(ad);
+        })
+        .catch(() => {
+          setAd(undefined);
+        });
+    }
+    fetAd();
+  }, []);
+
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<LoginPage setUser={setUser} />} />
-      <Route path="/register" element={<RegistrationPage />} />
-      <Route
-        path="/home"
-        element={
-          <ProtectedRoute user={user} checkAdmin={false}>
-            <HomePage user={user!} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute user={user} checkAdmin={true}>
-            <AdminPage />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <>
+      {ad && <AnnoyingAd ad={ad} showAfterSecs={AD_SHOW_AFTER_SECS} />}
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<LoginPage setUser={setUser} />} />
+        <Route path="/register" element={<RegistrationPage />} />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute user={user} checkAdmin={false}>
+              <HomePage user={user!} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute user={user} checkAdmin={true}>
+              <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 };
 

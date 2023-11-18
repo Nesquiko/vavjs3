@@ -12,3 +12,10 @@ export interface User {
   name: string;
   age: number;
 }
+
+export interface Ad {
+  id: string;
+  imageUrl: string;
+  link: string;
+  counter: number;
+}

@@ -10,7 +10,7 @@ export const HomePage = ({ user }: HomePageProps) => {
 
   return (
     <div className="relative">
-      <h1>Home Page</h1>
+      <h1 className="text-black text-3xl">Home Page</h1>
       {user.name === 'admin' && (
         <button
           className="absolute top-0 right-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 mr-4"

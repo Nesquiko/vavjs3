@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { User } from '../model';
+import { Ad, User } from '../model';
 import { AddUserModal } from '../components/AddUserModal';
 import { dowloadFile } from '../lib/file';
 import { FileInputModal } from '../components/FileInputModal';
