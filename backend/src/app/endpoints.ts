@@ -11,6 +11,7 @@ import {
 import { Pool } from 'pg';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import { deleteUser, getAllUsers } from './admin';
 
 const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
@@ -54,6 +55,49 @@ app.get('/user/login/token', async (req, res) => {
     res.status(401).json({ error: e.message });
   }
 });
+
+app.get('/user', async (req, res) => {
+  let token = req.cookies['sessionToken'];
+  try {
+    await checkIfAdmin(pool, token);
+    let users = await getAllUsers(pool);
+    res.status(200).json(users);
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.post('/admin/user', async (req: Request<{}, {}, NewUserRequest>, res) => {
+  try {
+    await checkIfAdmin(pool, req.cookies['sessionToken']);
+    let user = await registerUser(pool, req.body);
+    res.status(201).json(user);
+  } catch (e) {
+    if (e.message === 'Unauthorized') {
+      res.status(401).json({ error: e.message });
+    } else {
+      res.status(409).json({ error: e.message });
+    }
+  }
+});
+
+app.delete('/admin/user/:id', async (req, res) => {
+  try {
+    await checkIfAdmin(pool, req.cookies['sessionToken']);
+    await deleteUser(pool, req.params.id);
+    res.status(204).end();
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+async function checkIfAdmin(pool: Pool, token: string) {
+  let user = await loginWithToken(pool, token);
+  if (user.name !== 'admin') {
+    throw new Error('Unauthorized');
+  }
+  return user;
+}
 
 export function serverStart(_pool: Pool, port: number) {
   pool = _pool;

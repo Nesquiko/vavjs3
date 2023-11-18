@@ -8,12 +8,16 @@ create table if not exists user_account (
 	passwordHash varchar(72) not null,
 	age int not null
 );
+
+insert into user_account (id, email, name, passwordHash, age) values
+(gen_random_uuid(), 'admin', 'admin', '$2a$10$E2.zSvmlg1R2VMJHNhGyVOYXSC9ItTmUIfiHBb3x3dOxBqtVXyPKa', 20)
+on conflict do nothing;
 `;
 
 const INIT_TOKEN_SQL = `
 create table if not exists user_token (
 	id uuid primary key,
-	user_id uuid not null references user_account(id),
+	user_id uuid not null references user_account(id) on delete cascade,
 	expiration_date date not null
 );
 `;
@@ -32,7 +36,8 @@ create table if not exists REPLACE (
     date date not null,
 	value int not null,
 	type uuid not null references ride_type(id),
-	user_id uuid not null references user_account(id)
+	user_id uuid not null references user_account(id),
+	created_at timestamp not null 
 );
 `;
 
