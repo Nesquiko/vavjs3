@@ -26,6 +26,21 @@ export async function exportUsers(pool: Pool): Promise<{ csv: string }> {
   return { csv: usersToCsv(result) };
 }
 
+export async function importUsers(pool: Pool, csv: string): Promise<void> {
+  let lines = csv.split('\n').slice(1);
+  let users = lines.map((line) => {
+    let [id, name, email, passwordHash, age] = line.split(',');
+    return new User(id, email, passwordHash, name, parseInt(age));
+  });
+
+  for (let user of users) {
+    await pool.query(
+      'insert into user_account (id, email, passwordhash, name, age) values ($1, $2, $3, $4, $5) on conflict do nothing',
+      [user.id, user.email, user.passwordHash, user.name, user.age],
+    );
+  }
+}
+
 function usersToCsv(users: User[]) {
   const header = ['id', 'name', 'email', 'passworddHash', 'age'];
 

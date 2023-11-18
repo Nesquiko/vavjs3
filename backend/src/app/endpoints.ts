@@ -11,7 +11,7 @@ import {
 import { Pool } from 'pg';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import { deleteUser, exportUsers, getAllUsers } from './admin';
+import { deleteUser, exportUsers, getAllUsers, importUsers } from './admin';
 
 const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
@@ -96,6 +96,16 @@ app.get('/admin/user/export', async (req, res) => {
     await checkIfAdmin(pool, req.cookies['sessionToken']);
     let usersCsv = await exportUsers(pool);
     res.status(200).send(usersCsv);
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.post('/admin/user/import', async (req, res) => {
+  try {
+    await checkIfAdmin(pool, req.cookies['sessionToken']);
+    await importUsers(pool, req.body.csv);
+    res.status(204).end();
   } catch (e) {
     res.status(401).json({ error: e.message });
   }

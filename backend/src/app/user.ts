@@ -1,4 +1,3 @@
-import { UUID } from 'crypto';
 import { Pool } from 'pg';
 import bcrypt from 'bcrypt';
 
@@ -17,14 +16,14 @@ export class LoginRequest {
 }
 
 export class User {
-  public id: UUID;
+  public id: string;
   public email: string;
   public passwordHash: string;
   public name: string;
   public age: number;
 
   constructor(
-    id: UUID,
+    id: string,
     email: string,
     passwordHash: string,
     name: string,
