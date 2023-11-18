@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { User } from '../model';
 import { AddUserModal } from '../components/AddUserModal';
+import { dowloadFile } from '../lib/file';
 
 export const AdminPage = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -46,9 +47,22 @@ export const AdminPage = () => {
       });
   };
 
-  const handleExportUsers = () => {
-    // Add logic for exporting users
-    console.log('Exporting users');
+  const handleExportUsers = async () => {
+    await fetch(import.meta.env.VITE_BACKEND_URL + '/admin/user/export', {
+      credentials: 'include',
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Failed to export users');
+      })
+      .then((users) => {
+        dowloadFile('users.csv', users.csv);
+      })
+      .catch((error) => {
+        setErrorMessage(error.message);
+      });
   };
 
   const handleImportUsers = () => {
