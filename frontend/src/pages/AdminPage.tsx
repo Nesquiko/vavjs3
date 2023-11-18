@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { User } from '../model';
 import { AddUserModal } from '../components/AddUserModal';
 import { dowloadFile } from '../lib/file';
+import { FileInputModal } from '../components/FileInputModal';
 
 export const AdminPage = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -10,6 +11,7 @@ export const AdminPage = () => {
   );
   const [newUserAdUrl, setNewUserAdUrl] = useState<string>('');
   const [openAddUserModal, setOpenAddUserModal] = useState(false);
+  const [openFileInputModal, setOpenFileInputModal] = useState(false);
 
   const fetchUsers = async () => {
     await fetch(import.meta.env.VITE_BACKEND_URL + '/user', {
@@ -29,6 +31,13 @@ export const AdminPage = () => {
         setErrorMessage(error.message);
       });
   };
+
+  useEffect(() => {
+    async function fetchUsersOnLoad() {
+      await fetchUsers();
+    }
+    fetchUsersOnLoad();
+  }, []);
 
   const handleDeleteUser = async (userId: string) => {
     await fetch(import.meta.env.VITE_BACKEND_URL + `/admin/user/${userId}`, {
@@ -65,22 +74,31 @@ export const AdminPage = () => {
       });
   };
 
-  const handleImportUsers = () => {
-    // Add logic for importing users
-    console.log('Importing users');
+  const handleImportUsers = async (csv: string) => {
+    await fetch(import.meta.env.VITE_BACKEND_URL + '/admin/user/import', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ csv }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          fetchUsers();
+        } else {
+          throw new Error('Failed to import users');
+        }
+      })
+      .catch((error) => {
+        setErrorMessage(error.message);
+      });
   };
 
   const handleSaveAd = () => {
     // Add logic for saving ad
     console.log('Saving ad:', newUserAdUrl);
   };
-
-  useEffect(() => {
-    async function fetchUsersOnLoad() {
-      await fetchUsers();
-    }
-    fetchUsersOnLoad();
-  }, []);
 
   return (
     <div className="container mx-auto mt-8">
@@ -90,6 +108,12 @@ export const AdminPage = () => {
           setOpenAddUserModal(false);
           fetchUsers();
         }}
+      />
+      <FileInputModal
+        open={openFileInputModal}
+        onRead={handleImportUsers}
+        onClose={() => setOpenFileInputModal(false)}
+        label="Import Users"
       />
 
       <h1 className="text-2xl font-bold mb-4">Admin Page</h1>
@@ -129,7 +153,7 @@ export const AdminPage = () => {
         </button>
         <button
           className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
-          onClick={handleImportUsers}
+          onClick={() => setOpenFileInputModal(true)}
         >
           Import Users
         </button>
