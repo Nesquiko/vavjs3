@@ -36,9 +36,8 @@ create table if not exists REPLACE (
 	id uuid primary key,
     date date not null,
 	value int not null,
-	type uuid not null references ride_type(id),
-	user_id uuid not null references user_account(id),
-	created_at timestamp not null 
+	type_id uuid references ride_type(id),
+	user_id uuid not null references user_account(id)
 );
 `;
 
@@ -55,7 +54,7 @@ create table if not exists ad (
 );
 
 insert into ad (id, image_url, link, counter) values
-('38469554-300f-4a04-b231-0b209f2ecfda', 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.alza.sk%2Fsplatky&psig=AOvVaw2lF4tG3MOnQF84ShsLiG3Z&ust=1700415725897000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCLCipqyMzoIDFQAAAAAdAAAAABAE', 'https://www.alza.sk', 0)
+('38469554-300f-4a04-b231-0b209f2ecfda', 'https://cdn.alza.sk/Foto/or/lp/splatky/img/header.png', 'https://www.alza.sk', 0)
 on conflict do nothing;
 `;
 

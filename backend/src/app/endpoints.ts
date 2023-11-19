@@ -15,7 +15,14 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { deleteUser, exportUsers, getAllUsers, importUsers } from './admin';
 import { getAd, incrementAdCounter, updateAd } from './ad';
-import { createRideType, deleteRideType, getRideTypesOfUser } from './ride';
+import {
+  createRideType,
+  deleteRideEntry,
+  deleteRideType,
+  getRideTypesOfUser,
+  getUserRides,
+  saveRideEntry,
+} from './ride';
 
 const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
@@ -40,6 +47,8 @@ app.post('/user/login', async (req: Request<{}, {}, LoginRequest>, res) => {
     let [user, token] = await loginUser(pool, req.body);
     let userRideTypes = await getRideTypesOfUser(pool, user);
     user['rideTypes'] = userRideTypes;
+    let userRides = await getUserRides(pool, user);
+    user['rides'] = userRides;
 
     res
       .cookie('sessionToken', token, {
@@ -49,7 +58,6 @@ app.post('/user/login', async (req: Request<{}, {}, LoginRequest>, res) => {
       .status(200)
       .json(user);
   } catch (e) {
-    console.log(e);
     res.status(401).json({ error: e.message });
   }
 });
@@ -74,6 +82,8 @@ app.get('/user/login/token', async (req, res) => {
     let user = await loginWithToken(pool, token);
     let userRideTypes = await getRideTypesOfUser(pool, user);
     user['rideTypes'] = userRideTypes;
+    let userRides = await getUserRides(pool, user);
+    user['rides'] = userRides;
     res.status(200).json(user);
   } catch (e) {
     res.status(401).json({ error: e.message });
@@ -105,6 +115,26 @@ app.delete('/user/ridetype/:id', async (req, res) => {
   try {
     let user = await loginWithToken(pool, req.cookies['sessionToken']);
     await deleteRideType(pool, req.params.id, user);
+    res.status(204).end();
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.post('/user/ride', async (req, res) => {
+  try {
+    let user = await loginWithToken(pool, req.cookies['sessionToken']);
+    let ride = await saveRideEntry(pool, req.body, user);
+    res.status(201).json(ride);
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.delete('/user/ride/:id', async (req, res) => {
+  try {
+    let user = await loginWithToken(pool, req.cookies['sessionToken']);
+    await deleteRideEntry(pool, req.params.id, req.body.entryType, user);
     res.status(204).end();
   } catch (e) {
     res.status(401).json({ error: e.message });
