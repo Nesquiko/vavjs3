@@ -134,6 +134,7 @@ export const AdminPage = ({ ad }: AdminPageProps) => {
     <div className="container mx-auto mt-8">
       <AddUserModal
         open={openAddUserModal}
+        setOpen={setOpenAddUserModal}
         onClose={() => {
           setOpenAddUserModal(false);
           fetchUsers();
@@ -141,6 +142,7 @@ export const AdminPage = ({ ad }: AdminPageProps) => {
       />
       <FileInputModal
         open={openFileInputModal}
+        setOpen={setOpenFileInputModal}
         onRead={handleImportUsers}
         onClose={() => setOpenFileInputModal(false)}
         label="Import Users"

@@ -1,13 +1,16 @@
 import { useNavigate } from 'react-router-dom';
-import { User } from '../model';
+import { RideType, User } from '../model';
 import { useState } from 'react';
+import { ManageRideTypesModal } from '../components/ManageRideTypesModal';
 
 interface HomePageProps {
   user: User;
+  setRideTypes: (rideTypes: RideType[]) => void;
 }
 
-export const HomePage = ({ user }: HomePageProps) => {
+export const HomePage = ({ user, setRideTypes }: HomePageProps) => {
   const [errorMessage, setErrorMessage] = useState('');
+  const [openManageRideTypes, setOpenManageRideTypes] = useState(false);
   const navigation = useNavigate();
 
   const handleLogout = async () => {
@@ -28,8 +31,14 @@ export const HomePage = ({ user }: HomePageProps) => {
   };
 
   return (
-    <div className="relative">
-      <h1 className="text-black text-3xl">Home Page</h1>
+    <div className="relative p-4">
+      <ManageRideTypesModal
+        open={openManageRideTypes}
+        onClose={() => setOpenManageRideTypes(false)}
+        rideTypes={user.rideTypes}
+        setRideTypes={setRideTypes}
+      />
+      <h1 className="text-black text-3xl">Rides Dashboard</h1>
       {errorMessage && (
         <p className="text-red-500 mb-4 text-center">{errorMessage}</p>
       )}

@@ -11,6 +11,7 @@ export interface User {
   passwordHash: string;
   name: string;
   age: number;
+  rideTypes: RideType[];
 }
 
 export interface Ad {
@@ -18,4 +19,11 @@ export interface Ad {
   imageUrl: string;
   link: string;
   counter: number;
+}
+
+export interface RideType {
+  id: string;
+  name: string;
+  description: string;
+  userId: string;
 }

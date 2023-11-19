@@ -12,7 +12,7 @@ import { LoginPage } from './pages/LoginPage.tsx';
 import { RegistrationPage } from './pages/RegistrationPage.tsx';
 import { HomePage } from './pages/HomePage.tsx';
 import { ProtectedRoute } from './pages/ProtectedRoute';
-import { Ad, User } from './model.ts';
+import { Ad, RideType, User } from './model.ts';
 import { AdminPage } from './pages/AdminPage.tsx';
 import { AnnoyingAd } from './pages/AnnoyingAd.tsx';
 
@@ -22,6 +22,10 @@ const Root = () => {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [ad, setAd] = useState<Ad | undefined>(undefined);
   const navigation = useNavigate();
+
+  const setRideTypes = (rideTypes: RideType[]) => {
+    setUser({ ...user!, rideTypes: rideTypes });
+  };
 
   useEffect(() => {
     async function fetchUserWithToken() {
@@ -81,7 +85,7 @@ const Root = () => {
           path="/home"
           element={
             <ProtectedRoute user={user} checkAdmin={false}>
-              <HomePage user={user!} />
+              <HomePage user={user!} setRideTypes={setRideTypes} />
             </ProtectedRoute>
           }
         />
@@ -89,7 +93,7 @@ const Root = () => {
           path="/admin"
           element={
             <ProtectedRoute user={user} checkAdmin={true}>
-              <AdminPage ad={ad} />
+              <AdminPage ad={ad!} />
             </ProtectedRoute>
           }
         />
