@@ -27,6 +27,10 @@ const Root = () => {
     setUser({ ...user!, rideTypes: rideTypes });
   };
 
+  const setRideEntries = (rideEntries: RideEntry[]) => {
+    setUser({ ...user!, rides: rideEntries });
+  };
+
   useEffect(() => {
     async function fetchUserWithToken() {
       await fetch(import.meta.env.VITE_BACKEND_URL + '/user/login/token', {
@@ -85,7 +89,11 @@ const Root = () => {
           path="/home"
           element={
             <ProtectedRoute user={user} checkAdmin={false}>
-              <HomePage user={user!} setRideTypes={setRideTypes} />
+              <HomePage
+                user={user!}
+                setRideTypes={setRideTypes}
+                setRideEntries={setRideEntries}
+              />
             </ProtectedRoute>
           }
         />

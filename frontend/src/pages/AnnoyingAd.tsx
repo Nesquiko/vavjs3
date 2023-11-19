@@ -41,6 +41,7 @@ export const AnnoyingAd = ({ ad, showAfterSecs, user }: AnnoyingAdProps) => {
   // source https://stackoverflow.com/questions/68685880/how-to-increment-a-react-state-every-second-using-setinterval
   useEffect(() => {
     if (user.name === 'admin') {
+      console.log('admin logged in, no ad');
       return;
     }
 
@@ -52,6 +53,7 @@ export const AnnoyingAd = ({ ad, showAfterSecs, user }: AnnoyingAdProps) => {
 
   useEffect(() => {
     if (adTimer === showAfterSecs && ad) {
+      console.log('openneing ad at', new Date());
       setOpen(true);
     }
   }, [adTimer]);
@@ -78,7 +80,7 @@ export const AnnoyingAd = ({ ad, showAfterSecs, user }: AnnoyingAdProps) => {
                     relocate();
                     return;
                   }
-                  setCloses(0);
+                  setCloses(1);
                   setOpen(false);
                   setAdTimer(0);
                 }}
@@ -94,7 +96,7 @@ export const AnnoyingAd = ({ ad, showAfterSecs, user }: AnnoyingAdProps) => {
                 setOpen(false);
                 setAdTimer(0);
                 addClicked();
-                setCloses(0);
+                setCloses(1);
               }}
             />
           </div>

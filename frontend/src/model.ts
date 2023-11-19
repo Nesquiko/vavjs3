@@ -12,6 +12,7 @@ export interface User {
   name: string;
   age: number;
   rideTypes: RideType[];
+  rides: RideEntry[];
 }
 
 export interface Ad {
@@ -26,4 +27,27 @@ export interface RideType {
   name: string;
   description: string;
   userId: string;
+}
+
+export enum RideEntryType {
+  ROUTE = 'route',
+  DURATION = 'duration',
+  CONSUMPTION = 'consumption',
+}
+
+export interface NewRideEntry {
+  date: Date;
+  value: number;
+  typeId: string;
+  typeName: string;
+  rideEntryType: RideEntryType;
+}
+
+export interface RideEntry {
+  id: string;
+  date: string;
+  value: number;
+  typeId: string;
+  typeName: string;
+  rideEntryType: RideEntryType;
 }
