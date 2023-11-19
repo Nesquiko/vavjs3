@@ -25,11 +25,11 @@ export async function getAd(pool: Pool): Promise<Ad> {
 }
 
 export async function updateAd(pool: Pool, ad: Ad) {
-  await pool.query('update ad set image_url = $1, link = $2 where id = $3', [
-    ad.imageUrl,
-    ad.link,
-    ad.id,
-  ]);
+  await pool.query(
+    'update ad set image_url = $1, link = $2, counter = 0 where id = $3 returning *',
+    [ad.imageUrl, ad.link, ad.id],
+  );
+  return new Ad(ad.id, ad.imageUrl, ad.link, 0);
 }
 
 export async function incrementAdCounter(pool: Pool, adId: string) {

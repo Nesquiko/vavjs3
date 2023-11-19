@@ -94,6 +94,12 @@ export async function loginUser(
   return [user, token.rows[0].id];
 }
 
+export async function logoutUser(pool: Pool, token: string): Promise<void> {
+  let result = await pool.query('delete from user_token where id = $1', [
+    token,
+  ]);
+}
+
 export async function loginWithToken(pool: Pool, token: string): Promise<User> {
   let result = await pool.query(
     'select * from user_account where id = (select user_id from user_token where id = $1 and expiration_date >= current_timestamp)',

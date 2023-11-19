@@ -7,13 +7,14 @@ import {
   checkIfTokenLoggedIn,
   loginUser,
   loginWithToken,
+  logoutUser,
   registerUser,
 } from './user';
 import { Pool } from 'pg';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { deleteUser, exportUsers, getAllUsers, importUsers } from './admin';
-import { getAd, incrementAdCounter } from './ad';
+import { getAd, incrementAdCounter, updateAd } from './ad';
 
 const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
@@ -45,6 +46,20 @@ app.post('/user/login', async (req: Request<{}, {}, LoginRequest>, res) => {
       .json(user);
   } catch (e) {
     res.status(401).json({ error: e.message });
+  }
+});
+
+app.post('/user/logout', async (req, res) => {
+  try {
+    await checkIfLoggedIn(pool, req.cookies['sessionToken']);
+    await logoutUser(pool, req.cookies['sessionToken']);
+    res.clearCookie('sessionToken').status(204).end();
+  } catch (e) {
+    if (e.message === 'Unauthorized') {
+      res.status(401).json({ error: e.message });
+      return;
+    }
+    res.status(500).end();
   }
 });
 
@@ -117,6 +132,16 @@ app.get('/ad', async (req, res) => {
   try {
     await checkIfLoggedIn(pool, req.cookies['sessionToken']);
     let ad = await getAd(pool);
+    res.status(200).json(ad);
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.put('/admin/ad', async (req, res) => {
+  try {
+    await checkIfAdmin(pool, req.cookies['sessionToken']);
+    let ad = await updateAd(pool, req.body);
     res.status(200).json(ad);
   } catch (e) {
     res.status(401).json({ error: e.message });
