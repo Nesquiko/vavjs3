@@ -1,9 +1,9 @@
-// source https://blog.webdevsimplified.com/2023-04/html-dialog/
-
 import { useEffect, useRef, useState } from 'react';
+import { Modal } from './Modal';
 
 interface FileInputModalProps {
   open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onRead: (contents: string) => void;
   onClose: () => void;
   label: string;
@@ -11,48 +11,17 @@ interface FileInputModalProps {
 
 export const FileInputModal = ({
   open,
+  setOpen,
   onRead,
   onClose,
   label,
 }: FileInputModalProps) => {
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const [fileContents, setFileContents] = useState<string | undefined>(
     undefined,
   );
 
-  const closeDialog = () => {
-    dialogRef.current!.close();
-    onClose();
-  };
-
-  useEffect(() => {
-    if (dialogRef.current === null) {
-      return;
-    }
-
-    if (open) {
-      dialogRef.current!.showModal();
-    } else {
-      closeDialog();
-    }
-  }, [open]);
-
   return (
-    <dialog
-      className="p-4"
-      ref={dialogRef}
-      onClick={(e) => {
-        const dialogDimensions = dialogRef.current!.getBoundingClientRect();
-        if (
-          e.clientX < dialogDimensions.left ||
-          e.clientX > dialogDimensions.right ||
-          e.clientY < dialogDimensions.top ||
-          e.clientY > dialogDimensions.bottom
-        ) {
-          closeDialog();
-        }
-      }}
-    >
+    <Modal open={open} onClose={onClose}>
       <input
         type="file"
         onChange={(e) => {
@@ -69,12 +38,12 @@ export const FileInputModal = ({
         onClick={() => {
           if (fileContents) {
             onRead(fileContents);
-            closeDialog();
+            setOpen(false);
           }
         }}
       >
         {label}
       </button>
-    </dialog>
+    </Modal>
   );
 };

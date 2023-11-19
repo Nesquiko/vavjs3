@@ -1,34 +1,16 @@
-// source https://blog.webdevsimplified.com/2023-04/html-dialog/
-
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { NewUserForm } from './NewUserForm';
 import { RegistrationRequest } from '../model';
+import { Modal } from './Modal';
 
 interface AddUserModalProps {
   open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onClose: () => void;
 }
 
-export const AddUserModal = ({ open, onClose }: AddUserModalProps) => {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+export const AddUserModal = ({ open, setOpen, onClose }: AddUserModalProps) => {
   const [errorMessage, setErrorMessage] = useState('');
-
-  const closeDialog = () => {
-    dialogRef.current!.close();
-    onClose();
-  };
-
-  useEffect(() => {
-    if (dialogRef.current === null) {
-      return;
-    }
-
-    if (open) {
-      dialogRef.current!.showModal();
-    } else {
-      closeDialog();
-    }
-  }, [open]);
 
   const handleRegistration = async (
     registrationReq: RegistrationRequest,
@@ -47,7 +29,7 @@ export const AddUserModal = ({ open, onClose }: AddUserModalProps) => {
       body: JSON.stringify(registrationReq),
     }).then((response) => {
       if (response.ok) {
-        closeDialog();
+        setOpen(false);
       } else if (response.status === 409) {
         setErrorMessage('Email already exists');
       } else {
@@ -57,24 +39,11 @@ export const AddUserModal = ({ open, onClose }: AddUserModalProps) => {
   };
 
   return (
-    <dialog
-      ref={dialogRef}
-      onClick={(e) => {
-        const dialogDimensions = dialogRef.current!.getBoundingClientRect();
-        if (
-          e.clientX < dialogDimensions.left ||
-          e.clientX > dialogDimensions.right ||
-          e.clientY < dialogDimensions.top ||
-          e.clientY > dialogDimensions.bottom
-        ) {
-          closeDialog();
-        }
-      }}
-    >
+    <Modal open={open} onClose={onClose}>
       <NewUserForm
         handleRegistration={handleRegistration}
         errorMessage={errorMessage}
       />
-    </dialog>
+    </Modal>
   );
 };
