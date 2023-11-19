@@ -4,12 +4,19 @@ import { AddUserModal } from '../components/AddUserModal';
 import { dowloadFile } from '../lib/file';
 import { FileInputModal } from '../components/FileInputModal';
 
-export const AdminPage = () => {
+interface AdminPageProps {
+  ad: Ad;
+}
+
+export const AdminPage = ({ ad }: AdminPageProps) => {
   const [users, setUsers] = useState<User[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined,
   );
-  const [newUserAdUrl, setNewUserAdUrl] = useState<string>('');
+
+  const [newAdUrl, setNewAdUrl] = useState<string>(ad.imageUrl);
+  const [newAdLink, setNewAdLink] = useState<string>(ad.link);
+
   const [openAddUserModal, setOpenAddUserModal] = useState(false);
   const [openFileInputModal, setOpenFileInputModal] = useState(false);
 
@@ -95,9 +102,32 @@ export const AdminPage = () => {
       });
   };
 
-  const handleSaveAd = () => {
-    // Add logic for saving ad
-    console.log('Saving ad:', newUserAdUrl);
+  const handleSaveAd = async () => {
+    let newAd = { ...ad, imageUrl: newAdUrl, link: newAdLink };
+    await fetch(import.meta.env.VITE_BACKEND_URL + '/admin/ad', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newAd),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Failed to save ad');
+        }
+      })
+      .then((ad) => {
+        console.log(ad);
+        setNewAdUrl(ad.imageUrl);
+        setNewAdLink(ad.link);
+      })
+      .catch((error) => {
+        console.log(error);
+        setErrorMessage(error.message);
+      });
   };
 
   return (
@@ -120,15 +150,31 @@ export const AdminPage = () => {
       {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
 
       <div className="border p-4 rounded mb-4">
-        <h2 className="text-lg font-bold mb-2">Ad Section</h2>
-        <div className="flex mb-4">
-          <input
-            type="text"
-            placeholder="Enter Ad URL"
-            value={newUserAdUrl}
-            onChange={(e) => setNewUserAdUrl(e.target.value)}
-            className="border rounded px-2 py-1 mr-2 w-full"
-          />
+        <h2 className="text-lg font-bold mb-2">Current ad</h2>
+        <div className="flex flex-col gap-4 mb-4">
+          <label>
+            <b>Ad Image Url</b>
+            <input
+              type="text"
+              placeholder="Enter Ad URL"
+              value={newAdUrl}
+              onChange={(e) => setNewAdUrl(e.target.value)}
+              className="border rounded px-2 py-1 mr-2 w-full"
+            />
+          </label>
+          <label>
+            <b>Ad Link</b>
+            <input
+              type="text"
+              placeholder="Enter Ad URL"
+              value={newAdLink}
+              onChange={(e) => setNewAdLink(e.target.value)}
+              className="border rounded px-2 py-1 mr-2 w-full"
+            />
+          </label>
+          <p className="text-sm text-gray-500">
+            Current ad counter: {ad.counter}
+          </p>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-12 rounded"
             onClick={handleSaveAd}

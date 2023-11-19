@@ -70,7 +70,9 @@ const Root = () => {
 
   return (
     <>
-      {ad && <AnnoyingAd ad={ad} showAfterSecs={AD_SHOW_AFTER_SECS} />}
+      {ad && (
+        <AnnoyingAd user={user!} ad={ad} showAfterSecs={AD_SHOW_AFTER_SECS} />
+      )}
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage setUser={setUser} />} />
@@ -87,7 +89,7 @@ const Root = () => {
           path="/admin"
           element={
             <ProtectedRoute user={user} checkAdmin={true}>
-              <AdminPage />
+              <AdminPage ad={ad} />
             </ProtectedRoute>
           }
         />

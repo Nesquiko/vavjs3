@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Ad } from '../model';
+import { Ad, User } from '../model';
 
 interface AnnoyingAdProps {
   showAfterSecs: number;
   ad: Ad;
+  user: User;
 }
 
 const AD_WIDTH = 300;
@@ -15,7 +16,7 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export const AnnoyingAd = ({ ad, showAfterSecs }: AnnoyingAdProps) => {
+export const AnnoyingAd = ({ ad, showAfterSecs, user }: AnnoyingAdProps) => {
   const [open, setOpen] = useState(false);
   const [adTimer, setAdTimer] = useState(0);
   const [closes, setCloses] = useState(1);
@@ -39,6 +40,10 @@ export const AnnoyingAd = ({ ad, showAfterSecs }: AnnoyingAdProps) => {
 
   // source https://stackoverflow.com/questions/68685880/how-to-increment-a-react-state-every-second-using-setinterval
   useEffect(() => {
+    if (user.name === 'admin') {
+      return;
+    }
+
     let intervalId = setInterval(() => {
       setAdTimer((adTimer) => adTimer + 1);
     }, 1000);
