@@ -26,7 +26,8 @@ const INIT_RIDE_TYPE_SQL = `
 create table if not exists ride_type (
 	id uuid primary key,
     name varchar(255) not null,
-	description text
+	description text,
+	user_id uuid not null references user_account(id) on delete cascade
 );
 `;
 

@@ -15,6 +15,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { deleteUser, exportUsers, getAllUsers, importUsers } from './admin';
 import { getAd, incrementAdCounter, updateAd } from './ad';
+import { createRideType, deleteRideType, getRideTypesOfUser } from './ride';
 
 const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
@@ -37,6 +38,9 @@ app.post('/user', async (req: Request<{}, {}, NewUserRequest>, res) => {
 app.post('/user/login', async (req: Request<{}, {}, LoginRequest>, res) => {
   try {
     let [user, token] = await loginUser(pool, req.body);
+    let userRideTypes = await getRideTypesOfUser(pool, user);
+    user['rideTypes'] = userRideTypes;
+
     res
       .cookie('sessionToken', token, {
         maxAge: USER_SESSION_AGE,
@@ -45,6 +49,7 @@ app.post('/user/login', async (req: Request<{}, {}, LoginRequest>, res) => {
       .status(200)
       .json(user);
   } catch (e) {
+    console.log(e);
     res.status(401).json({ error: e.message });
   }
 });
@@ -67,6 +72,8 @@ app.get('/user/login/token', async (req, res) => {
   try {
     let token = req.cookies['sessionToken'];
     let user = await loginWithToken(pool, token);
+    let userRideTypes = await getRideTypesOfUser(pool, user);
+    user['rideTypes'] = userRideTypes;
     res.status(200).json(user);
   } catch (e) {
     res.status(401).json({ error: e.message });
@@ -79,6 +86,26 @@ app.get('/user', async (req, res) => {
     await checkIfAdmin(pool, token);
     let users = await getAllUsers(pool);
     res.status(200).json(users);
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.post('/user/ridetype', async (req, res) => {
+  try {
+    let user = await loginWithToken(pool, req.cookies['sessionToken']);
+    let rideType = await createRideType(pool, req.body, user);
+    res.status(201).json(rideType);
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.delete('/user/ridetype/:id', async (req, res) => {
+  try {
+    let user = await loginWithToken(pool, req.cookies['sessionToken']);
+    await deleteRideType(pool, req.params.id, user);
+    res.status(204).end();
   } catch (e) {
     res.status(401).json({ error: e.message });
   }
