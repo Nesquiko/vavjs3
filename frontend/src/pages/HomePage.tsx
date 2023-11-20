@@ -9,6 +9,8 @@ import {
 import { useState } from 'react';
 import { ManageRideTypesModal } from '../components/ManageRideTypesModal';
 import { RidesList } from '../components/RidesList';
+import { dowloadFile } from '../lib/file';
+import { FileInputModal } from '../components/FileInputModal';
 
 interface HomePageProps {
   user: User;
@@ -24,6 +26,7 @@ export const HomePage = ({
   const navigation = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const [newRideErrorMessage, setNewRideErrorMessage] = useState('');
+  const [ridesListErrorMessage, setRidesListErrorMessage] = useState('');
   const [openManageRideTypes, setOpenManageRideTypes] = useState(false);
   const [selectedRideEntryType, setSelectedMetric] = useState<RideEntryType>(
     RideEntryType.ROUTE,
@@ -33,6 +36,7 @@ export const HomePage = ({
   );
   const [rideValue, setRideValue] = useState<number | null>(null);
   const [rideDate, setRideDate] = useState<Date | undefined>(undefined);
+  const [openFileInputModal, setOpenFileInputModal] = useState(false);
 
   const handleLogout = async () => {
     await fetch(import.meta.env.VITE_BACKEND_URL + '/user/logout', {
@@ -46,9 +50,7 @@ export const HomePage = ({
           throw new Error('Failed to logout');
         }
       })
-      .catch((error) => {
-        setErrorMessage(error.message);
-      });
+      .catch((error) => setErrorMessage(error.message));
   };
 
   const handleSaveRide = async () => {
@@ -69,7 +71,7 @@ export const HomePage = ({
 
     let newRideEntry: NewRideEntry = {
       date: rideDate,
-      value: rideValue * 100,
+      value: Math.round(rideValue * 100),
       typeId: selectedRideType === null ? '' : selectedRideType.id,
       typeName: selectedRideType === null ? '' : selectedRideType.name,
       rideEntryType: selectedRideEntryType,
@@ -89,16 +91,54 @@ export const HomePage = ({
         }
         throw new Error('Failed to save ride');
       })
-      .then((rideEntries) => {
-        setRideEntries(rideEntries);
+      .then((savedRide) => setRideEntries([...user.rides, savedRide]))
+      .catch((error) => setNewRideErrorMessage(error.message));
+  };
+
+  const handleExportRides = async () => {
+    await fetch(import.meta.env.VITE_BACKEND_URL + '/user/ride/export', {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Failed to export rides');
       })
-      .catch((error) => {
-        setNewRideErrorMessage(error.message);
-      });
+      .then((exportedRides) => dowloadFile('rides.csv', exportedRides.csv))
+      .catch((error) => setRidesListErrorMessage(error.message));
+  };
+
+  const handleImportUsers = async (contents: string) => {
+    await fetch(import.meta.env.VITE_BACKEND_URL + '/user/ride/import', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ csv: contents }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Failed to import rides');
+      })
+      .then((userRides) => setRideEntries(userRides))
+      .catch((error) => setRidesListErrorMessage(error.message));
   };
 
   return (
     <div className="relative p-4">
+      <FileInputModal
+        open={openFileInputModal}
+        setOpen={setOpenFileInputModal}
+        onRead={handleImportUsers}
+        onClose={() => setOpenFileInputModal(false)}
+        label="Import Rides"
+      />
+
       <ManageRideTypesModal
         open={openManageRideTypes}
         onClose={() => setOpenManageRideTypes(false)}
@@ -218,6 +258,11 @@ export const HomePage = ({
       </div>
       <div className="p-4 m-4 gap-4 border rounded">
         <div className="flex justify-end gap-4">
+          {ridesListErrorMessage && (
+            <p className="text-red-500 mb-4 text-center">
+              {ridesListErrorMessage}
+            </p>
+          )}
           <button
             className="bg-green-500 text-white w-40 font-bold py-2 px-4 rounded"
             onClick={() => {
@@ -228,17 +273,13 @@ export const HomePage = ({
           </button>
           <button
             className="bg-blue-500 text-white w-40 font-bold py-2 px-4 rounded"
-            onClick={() => {
-              // TODO export rides
-            }}
+            onClick={handleExportRides}
           >
             Export rides
           </button>
           <button
             className="bg-yellow-500 text-white w-40 font-bold py-2 px-4 rounded"
-            onClick={() => {
-              // TODO import rides
-            }}
+            onClick={() => setOpenFileInputModal(true)}
           >
             Import rides
           </button>

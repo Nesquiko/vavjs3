@@ -46,7 +46,10 @@ export const RidesList = ({ rides, setRides }: RidesListProps) => {
         <div>
           <p>{new Date(ride.date).toLocaleDateString()}</p>
           <span>
-            {ride.value / 100} {rideValueMetric} - {ride.typeName}
+            {ride.value / 100} {rideValueMetric}{' '}
+            {ride.typeName === null || ride.typeName === ''
+              ? ''
+              : `- ${ride.typeName}`}
           </span>
         </div>
         <button

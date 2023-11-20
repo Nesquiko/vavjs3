@@ -97,9 +97,7 @@ export const AdminPage = ({ ad }: AdminPageProps) => {
           throw new Error('Failed to import users');
         }
       })
-      .catch((error) => {
-        setErrorMessage(error.message);
-      });
+      .catch((error) => setErrorMessage(error.message));
   };
 
   const handleSaveAd = async () => {
@@ -120,14 +118,10 @@ export const AdminPage = ({ ad }: AdminPageProps) => {
         }
       })
       .then((ad) => {
-        console.log(ad);
         setNewAdUrl(ad.imageUrl);
         setNewAdLink(ad.link);
       })
-      .catch((error) => {
-        console.log(error);
-        setErrorMessage(error.message);
-      });
+      .catch((error) => setErrorMessage(error.message));
   };
 
   return (

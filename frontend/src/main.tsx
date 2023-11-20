@@ -12,7 +12,7 @@ import { LoginPage } from './pages/LoginPage.tsx';
 import { RegistrationPage } from './pages/RegistrationPage.tsx';
 import { HomePage } from './pages/HomePage.tsx';
 import { ProtectedRoute } from './pages/ProtectedRoute';
-import { Ad, RideType, User } from './model.ts';
+import { Ad, RideEntry, RideType, User } from './model.ts';
 import { AdminPage } from './pages/AdminPage.tsx';
 import { AnnoyingAd } from './pages/AnnoyingAd.tsx';
 
