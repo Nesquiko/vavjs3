@@ -157,3 +157,72 @@ export async function deleteRideEntry(
 
   await pool.query(query, [id, user.id]);
 }
+
+export async function exportUserRidesIntoCsv(
+  pool: Pool,
+  user: User,
+): Promise<{ csv: string }> {
+  let userRides = await getUserRides(pool, user);
+  return { csv: ridesToCsv(userRides) };
+}
+
+function ridesToCsv(rides: RideEntry[]): string {
+  const header = ['date', 'value', 'entryType', 'type'];
+
+  const csv = [header.join(',')];
+  rides.forEach((r) => {
+    csv.push(
+      [r.date.toISOString(), r.value, r.rideEntryType, r.typeName].join(','),
+    );
+  });
+  return csv.join('\n');
+}
+
+export async function importUserRidesFromCsv(
+  pool: Pool,
+  user: User,
+  csv: string,
+): Promise<void> {
+  let lines = csv.split('\n').slice(1);
+  let rides = lines.map((line) => {
+    let [date, value, entryType, typeName] = line.split(',');
+    return {
+      date: new Date(date),
+      value: Number(value),
+      entryType: entryType,
+      typeName: typeName,
+    };
+  });
+
+  for (let ride of rides) {
+    let rideType = await getRideTypeByName(pool, ride.typeName);
+
+    await pool.query(
+      'insert into REPLACE (id, date, value, type_id, user_id) values (gen_random_uuid(), $1, $2, $3, $4) on conflict do nothing'.replace(
+        'REPLACE',
+        ride.entryType,
+      ),
+      [ride.date, ride.value, rideType === null ? null : rideType.id, user.id],
+    );
+  }
+}
+
+async function getRideTypeByName(
+  pool: Pool,
+  typeName: string,
+): Promise<RideType> {
+  let result = await pool.query('select * from ride_type where name = $1', [
+    typeName,
+  ]);
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  return new RideType(
+    result.rows[0].id,
+    result.rows[0].name,
+    result.rows[0].description,
+    result.rows[0].user_id,
+  );
+}

@@ -95,9 +95,7 @@ export async function loginUser(
 }
 
 export async function logoutUser(pool: Pool, token: string): Promise<void> {
-  let result = await pool.query('delete from user_token where id = $1', [
-    token,
-  ]);
+  await pool.query('delete from user_token where id = $1', [token]);
 }
 
 export async function loginWithToken(pool: Pool, token: string): Promise<User> {

@@ -19,8 +19,10 @@ import {
   createRideType,
   deleteRideEntry,
   deleteRideType,
+  exportUserRidesIntoCsv,
   getRideTypesOfUser,
   getUserRides,
+  importUserRidesFromCsv,
   saveRideEntry,
 } from './ride';
 
@@ -136,6 +138,27 @@ app.delete('/user/ride/:id', async (req, res) => {
     let user = await loginWithToken(pool, req.cookies['sessionToken']);
     await deleteRideEntry(pool, req.params.id, req.body.entryType, user);
     res.status(204).end();
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.get('/user/ride/export', async (req, res) => {
+  try {
+    let user = await loginWithToken(pool, req.cookies['sessionToken']);
+    let ridesCsv = await exportUserRidesIntoCsv(pool, user);
+    res.status(200).send(ridesCsv);
+  } catch (e) {
+    res.status(401).json({ error: e.message });
+  }
+});
+
+app.post('/user/ride/import', async (req, res) => {
+  try {
+    let user = await loginWithToken(pool, req.cookies['sessionToken']);
+    await importUserRidesFromCsv(pool, user, req.body.csv);
+    let userRides = await getUserRides(pool, user);
+    res.status(200).json(userRides);
   } catch (e) {
     res.status(401).json({ error: e.message });
   }
