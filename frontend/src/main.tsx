@@ -15,6 +15,7 @@ import { ProtectedRoute } from './pages/ProtectedRoute';
 import { Ad, RideEntry, RideType, User } from './model.ts';
 import { AdminPage } from './pages/AdminPage.tsx';
 import { AnnoyingAd } from './pages/AnnoyingAd.tsx';
+import { RideGraphs } from './pages/RideGraphs.tsx';
 
 const AD_SHOW_AFTER_SECS = 60;
 
@@ -79,7 +80,7 @@ const Root = () => {
   return (
     <>
       {ad && (
-        <AnnoyingAd user={user!} ad={ad} showAfterSecs={AD_SHOW_AFTER_SECS} />
+        <AnnoyingAd user={user} ad={ad} showAfterSecs={AD_SHOW_AFTER_SECS} />
       )}
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
@@ -102,6 +103,14 @@ const Root = () => {
           element={
             <ProtectedRoute user={user} checkAdmin={true}>
               <AdminPage ad={ad!} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/graphs"
+          element={
+            <ProtectedRoute user={user} checkAdmin={false}>
+              <RideGraphs rides={user?.rides} />
             </ProtectedRoute>
           }
         />

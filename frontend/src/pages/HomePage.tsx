@@ -265,9 +265,7 @@ export const HomePage = ({
           )}
           <button
             className="bg-green-500 text-white w-40 font-bold py-2 px-4 rounded"
-            onClick={() => {
-              // TODO grapsh page
-            }}
+            onClick={() => navigation('/graphs')}
           >
             Graphs
           </button>

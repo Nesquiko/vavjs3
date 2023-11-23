@@ -3,7 +3,7 @@ import { RideEntry, RideEntryType } from '../model';
 
 interface RidesListProps {
   rides: RideEntry[];
-  setRides: (rides: RideEntry[]) => void;
+  setRides?: (rides: RideEntry[]) => void;
 }
 
 export const RidesList = ({ rides, setRides }: RidesListProps) => {
@@ -20,7 +20,7 @@ export const RidesList = ({ rides, setRides }: RidesListProps) => {
     })
       .then((response) => {
         if (response.ok) {
-          setRides(rides.filter((r) => r.id !== ride.id));
+          setRides?.(rides.filter((r) => r.id !== ride.id));
           return;
         }
         throw new Error('Failed to delete ride');
@@ -52,12 +52,14 @@ export const RidesList = ({ rides, setRides }: RidesListProps) => {
               : `- ${ride.typeName}`}
           </span>
         </div>
-        <button
-          className="bg-black text-white py-2 px-4 rounded font-bold"
-          onClick={() => handleDelete(ride)}
-        >
-          Delete
-        </button>
+        {setRides && (
+          <button
+            className="bg-black text-white py-2 px-4 rounded font-bold"
+            onClick={() => handleDelete(ride)}
+          >
+            Delete
+          </button>
+        )}
       </li>
     );
   };

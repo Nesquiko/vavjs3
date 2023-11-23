@@ -4,7 +4,7 @@ import { Ad, User } from '../model';
 interface AnnoyingAdProps {
   showAfterSecs: number;
   ad: Ad;
-  user: User;
+  user?: User;
 }
 
 const AD_WIDTH = 300;
@@ -40,12 +40,12 @@ export const AnnoyingAd = ({ ad, showAfterSecs, user }: AnnoyingAdProps) => {
 
   // source https://stackoverflow.com/questions/68685880/how-to-increment-a-react-state-every-second-using-setinterval
   useEffect(() => {
-    if (user.name === 'admin') {
-      console.log('admin logged in, no ad');
-      return;
-    }
-
     let intervalId = setInterval(() => {
+      if (user?.name === 'admin') {
+        clearInterval(intervalId);
+        return;
+      }
+
       setAdTimer((adTimer) => adTimer + 1);
     }, 1000);
     return () => clearInterval(intervalId);
