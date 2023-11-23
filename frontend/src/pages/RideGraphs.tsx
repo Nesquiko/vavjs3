@@ -12,6 +12,7 @@ import {
 } from 'chart.js';
 import { RidesList } from '../components/RidesList';
 import { Regressor, linearRegression } from '../lib/linearreg';
+import { useNavigate } from 'react-router-dom';
 
 interface RideGraphsProps {
   rides: RideEntry[];
@@ -27,6 +28,7 @@ Chart.register(
 );
 
 export const RideGraphs = ({ rides }: RideGraphsProps) => {
+  const navigate = useNavigate();
   const [filterFrom, setFilterFrom] = useState<Date | undefined>(undefined);
   const [filterTo, setFilterTo] = useState<Date | undefined>(undefined);
   const [filterEntryType, setFilterEntryType] = useState<RideEntryType>(
@@ -96,6 +98,13 @@ export const RideGraphs = ({ rides }: RideGraphsProps) => {
 
   return (
     <div className="p-4">
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={() => navigate('/home')}
+      >
+        Back to Rides Dashboard
+      </button>
+
       <div className="flex gap-4 p-4 justify-around">
         {Object.values(RideEntryType).map((rideEntryType) => (
           <button
