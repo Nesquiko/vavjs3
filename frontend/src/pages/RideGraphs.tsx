@@ -11,6 +11,7 @@ import {
   Tooltip,
 } from 'chart.js';
 import { RidesList } from '../components/RidesList';
+import { Regressor, linearRegression } from '../lib/linearreg';
 
 interface RideGraphsProps {
   rides: RideEntry[];
@@ -51,6 +52,14 @@ export const RideGraphs = ({ rides }: RideGraphsProps) => {
   };
 
   const [data, setData] = useState<RideEntry[]>(dataByType[filterEntryType]);
+  const [linReg, setLinReg] = useState<Regressor>(
+    linearRegression(
+      data.map((ride) => ({
+        x: new Date(ride.date),
+        y: ride.value / 100,
+      })),
+    ),
+  );
 
   useEffect(() => {
     const filteredRides = rides.filter((ride) => {
@@ -75,6 +84,14 @@ export const RideGraphs = ({ rides }: RideGraphsProps) => {
       .filter((ride) => ride.rideEntryType === RideEntryType.CONSUMPTION)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     setData(dataByType[filterEntryType]);
+    setLinReg(
+      linearRegression(
+        dataByType[filterEntryType].map((ride) => ({
+          x: new Date(ride.date),
+          y: ride.value / 100,
+        })),
+      ),
+    );
   }, [filterFrom, filterTo, filterEntryType]);
 
   return (
@@ -115,7 +132,6 @@ export const RideGraphs = ({ rides }: RideGraphsProps) => {
       </div>
 
       <div>
-        <RidesList rides={data} />
         <Line
           data={{
             labels: data.map((ride) =>
@@ -132,9 +148,22 @@ export const RideGraphs = ({ rides }: RideGraphsProps) => {
                 borderWidth: 2,
                 fill: false,
               },
+              {
+                label: 'Linear regression',
+                data: data.map((ride) => ({
+                  x: new Date(ride.date),
+                  y:
+                    linReg.slope * new Date(ride.date).getTime() +
+                    linReg.intercept,
+                })),
+                borderColor: 'orange',
+                borderWidth: 2,
+                fill: false,
+              },
             ],
           }}
         />
+        <RidesList rides={data} />
       </div>
     </div>
   );
