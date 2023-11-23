@@ -17,4 +17,4 @@ const pool = new Pool({
 });
 initDb(pool);
 
-serverStart(pool, 8080);
+serverStart(pool, parseInt(process.env.APP_PORT));

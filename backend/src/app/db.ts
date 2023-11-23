@@ -33,7 +33,7 @@ create table if not exists REPLACE (
     date date not null,
 	value int not null,
 	type_id uuid references ride_type(id) on delete set null,
-	user_id uuid not null references user_account(id)
+	user_id uuid not null references user_account(id) on delete cascade
 );
 `;
 

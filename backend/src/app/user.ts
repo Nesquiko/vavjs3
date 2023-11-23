@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import bcrypt from 'bcrypt';
 
-const SALT_ROUNDS = 10;
+export const SALT_ROUNDS = 10;
 
 export class NewUserRequest {
   public email: string;

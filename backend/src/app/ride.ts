@@ -15,7 +15,7 @@ export class RideType {
   }
 }
 
-enum RideEntryType {
+export enum RideEntryType {
   ROUTE = 'route',
   DURATION = 'duration',
   CONSUMPTION = 'consumption',
