@@ -1,11 +1,20 @@
-import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import axios from 'axios';
 import { RideType, RideEntryType } from '../src/app/ride';
+import { startServer } from '../src/app/main';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = `http://localhost:${process.env.APP_PORT}`;
 
 describe('e2e test', () => {
+  console.log('E2E test for app running on:', BASE_URL);
+  let serverStop: () => Promise<void>;
+
+  before(() => {
+    serverStop = startServer(parseInt(process.env.APP_PORT!), []);
+  });
+
+  after(() => serverStop());
+
   it('register', async () => {
     let newUserReq = {
       email: 'test@test.sk',

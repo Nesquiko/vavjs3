@@ -1,20 +1,12 @@
 import dotenv from 'dotenv';
+import { startServer } from './app/main';
+import morgan from 'morgan';
 
-const ENV_FILE = '.env.local';
-dotenv.config({ path: ENV_FILE });
+if (process.env.NODE_ENV === 'production') {
+} else if (process.env.NODE_ENV === 'test') {
+  //
+} else {
+  dotenv.config({ path: '.env.local' });
+}
 
-import { Pool } from 'pg';
-import { initDb } from './app/db';
-import { serverStart } from './app/endpoints';
-
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT),
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  ssl: false,
-});
-initDb(pool);
-
-serverStart(pool, parseInt(process.env.APP_PORT));
+startServer(parseInt(process.env.APP_PORT), [morgan('tiny')]);

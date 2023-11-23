@@ -30,7 +30,6 @@ const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
 let pool: Pool;
 const app = express();
-app.use(morgan('tiny'));
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
@@ -251,9 +250,19 @@ async function checkIfLoggedIn(pool: Pool, token: string) {
   }
 }
 
-export function serverStart(_pool: Pool, port: number) {
+export function serverStart(
+  _pool: Pool,
+  port: number,
+  middleware: express.RequestHandler[],
+) {
   pool = _pool;
-  app.listen(port, () => {
+
+  for (let m of middleware) {
+    app.use(m);
+  }
+
+  let server = app.listen(port, () => {
     console.log(`Listening on port ${port}`);
   });
+  return server;
 }
