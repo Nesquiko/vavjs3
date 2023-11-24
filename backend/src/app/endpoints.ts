@@ -1,6 +1,5 @@
 import { Request } from 'express';
 import express from 'express';
-import morgan from 'morgan';
 import {
   LoginRequest,
   NewUserRequest,
@@ -25,6 +24,7 @@ import {
   importUserRidesFromCsv,
   saveRideEntry,
 } from './ride';
+import path from 'path';
 
 const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
@@ -33,6 +33,7 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
+app.use(express.static('dist'));
 
 app.post('/user', async (req: Request<{}, {}, NewUserRequest>, res) => {
   try {
@@ -233,6 +234,10 @@ app.put('/ad/:id', async (req, res) => {
   } catch (e) {
     res.status(500).end();
   }
+});
+
+app.get('*', function (_req, res) {
+  res.sendFile('index.html', { root: 'dist' });
 });
 
 async function checkIfAdmin(pool: Pool, token: string) {

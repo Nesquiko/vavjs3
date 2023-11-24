@@ -50,7 +50,7 @@ create table if not exists ad (
 );
 `;
 
-const SEED_AD_SQL = `INSERT INTO public.ad VALUES ('38469554-300f-4a04-b231-0b209f2ecfda', 'https://cdn.alza.sk/Foto/or/lp/splatky/img/header.png', 'https://www.alza.sk/', 1) ON CONFLICT DO NOTHING;`;
+const SEED_AD_SQL = `INSERT INTO public.ad VALUES ('38469554-300f-4a04-b231-0b209f2ecfda', 'https://cdn.alza.sk/Foto/or/lp/splatky/img/header.png', 'https://www.alza.sk/', 0) ON CONFLICT DO NOTHING;`;
 const SEED_USER_SQL = `
 INSERT INTO public.user_account VALUES ('36e24ef0-c03a-4b5a-b385-e24e1dafd913', 'abc@gmail.com', 'abc', '$2b$10$CpHHJsi6ebcPq6Zcys9fre9EyKIrJFfoWqZaJ/DV6qEfN9DdZc3au', 23) ON CONFLICT DO NOTHING;
 INSERT INTO public.user_account VALUES ('4f2d45da-773d-44f1-8953-e5da650aa85a', 'def@gmail.com', 'BC', '$2b$10$Lj6AUXDyoy25JAVyd9Y9guat7zk/WIGfmDwI7y5w/TwK8xgex3tLG', 20) ON CONFLICT DO NOTHING;
