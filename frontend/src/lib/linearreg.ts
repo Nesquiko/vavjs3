@@ -11,7 +11,7 @@ export interface Regressor {
 }
 
 export function linearRegression(data: Point[]): Regressor {
-  let regressor = {
+  const regressor = {
     slope: 0,
     intercept: 0,
   };

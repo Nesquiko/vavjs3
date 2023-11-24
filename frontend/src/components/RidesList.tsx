@@ -31,7 +31,7 @@ export const RidesList = ({ rides, setRides }: RidesListProps) => {
   };
 
   const rideItem = (ride: RideEntry) => {
-    let rideValueMetric =
+    const rideValueMetric =
       ride.rideEntryType === RideEntryType.ROUTE
         ? 'km'
         : ride.rideEntryType === RideEntryType.DURATION

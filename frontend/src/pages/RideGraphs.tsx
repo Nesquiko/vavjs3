@@ -15,7 +15,7 @@ import { Regressor, linearRegression } from '../lib/linearreg';
 import { useNavigate } from 'react-router-dom';
 
 interface RideGraphsProps {
-  rides: RideEntry[];
+  rides?: RideEntry[];
 }
 
 Chart.register(
@@ -42,13 +42,13 @@ export const RideGraphs = ({ rides }: RideGraphsProps) => {
   };
 
   const dataByType = {
-    [RideEntryType.ROUTE]: rides
+    [RideEntryType.ROUTE]: (rides ?? [])
       .filter((ride) => ride.rideEntryType === RideEntryType.ROUTE)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
-    [RideEntryType.DURATION]: rides
+    [RideEntryType.DURATION]: (rides ?? [])
       .filter((ride) => ride.rideEntryType === RideEntryType.DURATION)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
-    [RideEntryType.CONSUMPTION]: rides
+    [RideEntryType.CONSUMPTION]: (rides ?? [])
       .filter((ride) => ride.rideEntryType === RideEntryType.CONSUMPTION)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
   };
@@ -64,7 +64,7 @@ export const RideGraphs = ({ rides }: RideGraphsProps) => {
   );
 
   useEffect(() => {
-    const filteredRides = rides.filter((ride) => {
+    const filteredRides = (rides ?? []).filter((ride) => {
       if (filterFrom && new Date(ride.date) < filterFrom) {
         return false;
       }

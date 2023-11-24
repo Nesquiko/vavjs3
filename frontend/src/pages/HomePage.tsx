@@ -69,7 +69,7 @@ export const HomePage = ({
     }
     setNewRideErrorMessage('');
 
-    let newRideEntry: NewRideEntry = {
+    const newRideEntry: NewRideEntry = {
       date: rideDate,
       value: Math.round(rideValue * 100),
       typeId: selectedRideType === null ? '' : selectedRideType.id,
@@ -221,7 +221,7 @@ export const HomePage = ({
                 return;
               }
 
-              let rideType = user.rideTypes.find(
+              const rideType = user.rideTypes.find(
                 (rideType) => rideType.id === e.target.value,
               );
               setSelectedRideType(rideType!);

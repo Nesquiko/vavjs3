@@ -3,19 +3,21 @@ import { Ad, User } from '../model';
 import { AddUserModal } from '../components/AddUserModal';
 import { dowloadFile } from '../lib/file';
 import { FileInputModal } from '../components/FileInputModal';
+import { useNavigate } from 'react-router-dom';
 
 interface AdminPageProps {
-  ad: Ad;
+  ad?: Ad;
 }
 
 export const AdminPage = ({ ad }: AdminPageProps) => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined,
   );
 
-  const [newAdUrl, setNewAdUrl] = useState<string>(ad.imageUrl);
-  const [newAdLink, setNewAdLink] = useState<string>(ad.link);
+  const [newAdUrl, setNewAdUrl] = useState<string>(ad?.imageUrl || '');
+  const [newAdLink, setNewAdLink] = useState<string>(ad?.link || '');
 
   const [openAddUserModal, setOpenAddUserModal] = useState(false);
   const [openFileInputModal, setOpenFileInputModal] = useState(false);
@@ -101,7 +103,7 @@ export const AdminPage = ({ ad }: AdminPageProps) => {
   };
 
   const handleSaveAd = async () => {
-    let newAd = { ...ad, imageUrl: newAdUrl, link: newAdLink };
+    const newAd = { ...ad, imageUrl: newAdUrl, link: newAdLink };
     await fetch(import.meta.env.VITE_BACKEND_URL + '/admin/ad', {
       method: 'PUT',
       credentials: 'include',
@@ -145,7 +147,14 @@ export const AdminPage = ({ ad }: AdminPageProps) => {
       <h1 className="text-2xl font-bold mb-4">Admin Page</h1>
       {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
 
-      <div className="border p-4 rounded mb-4">
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={() => navigate('/home')}
+      >
+        Back to Rides Dashboard
+      </button>
+
+      <div className="border p-4 rounded my-4">
         <h2 className="text-lg font-bold mb-2">Current ad</h2>
         <div className="flex flex-col gap-4 mb-4">
           <label>
@@ -169,7 +178,7 @@ export const AdminPage = ({ ad }: AdminPageProps) => {
             />
           </label>
           <p className="text-sm text-gray-500">
-            Current ad counter: {ad.counter}
+            Current ad counter: {ad?.counter}
           </p>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-12 rounded"

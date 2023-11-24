@@ -40,7 +40,7 @@ export const AnnoyingAd = ({ ad, showAfterSecs, user }: AnnoyingAdProps) => {
 
   // source https://stackoverflow.com/questions/68685880/how-to-increment-a-react-state-every-second-using-setinterval
   useEffect(() => {
-    let intervalId = setInterval(() => {
+    const intervalId = setInterval(() => {
       if (user?.name === 'admin') {
         clearInterval(intervalId);
         return;

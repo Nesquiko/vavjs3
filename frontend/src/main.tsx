@@ -102,7 +102,7 @@ const Root = () => {
           path="/admin"
           element={
             <ProtectedRoute user={user} checkAdmin={true}>
-              <AdminPage ad={ad!} />
+              <AdminPage ad={ad} />
             </ProtectedRoute>
           }
         />

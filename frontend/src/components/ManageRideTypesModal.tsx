@@ -22,7 +22,7 @@ export const ManageRideTypesModal = ({
   });
 
   const handleCreateRideType = async () => {
-    let rt: RideType = {
+    const rt: RideType = {
       id: '',
       name: newRideType.name,
       description: newRideType.description,
@@ -45,7 +45,7 @@ export const ManageRideTypesModal = ({
         }
       })
       .then((rideType) => {
-        let newRideTypes = [...rideTypes, rideType];
+        const newRideTypes = [...rideTypes, rideType];
         setRideTypes(newRideTypes);
         setNewRideType({ name: '', description: '' });
       })
@@ -61,7 +61,7 @@ export const ManageRideTypesModal = ({
     })
       .then((response) => {
         if (response.ok) {
-          let newRideTypes = rideTypes.filter((rt) => rt.id !== id);
+          const newRideTypes = rideTypes.filter((rt) => rt.id !== id);
           setRideTypes(newRideTypes);
         } else {
           setErrorMessage('Failed to delete ride type');
