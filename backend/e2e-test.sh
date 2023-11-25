@@ -8,6 +8,7 @@ export DB_USERNAME=postgres
 export DB_PASSWORD=postgres
 export DB_DATABASE=vavjs_zadanie3
 export APP_PORT=42069
+export NODE_ENV=test
 
 docker run --rm --name ${TEST_DB_DOCKER_NAME} \
 	-p ${DB_PORT}:5432 \

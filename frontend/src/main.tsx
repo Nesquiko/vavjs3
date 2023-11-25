@@ -94,6 +94,7 @@ const Root = () => {
                 user={user!}
                 setRideTypes={setRideTypes}
                 setRideEntries={setRideEntries}
+                setUser={setUser}
               />
             </ProtectedRoute>
           }

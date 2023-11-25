@@ -16,12 +16,14 @@ interface HomePageProps {
   user: User;
   setRideTypes: (rideTypes: RideType[]) => void;
   setRideEntries: (rideEntries: RideEntry[]) => void;
+  setUser: (user: User | undefined) => void;
 }
 
 export const HomePage = ({
   user,
   setRideTypes,
   setRideEntries,
+  setUser,
 }: HomePageProps) => {
   const navigation = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
@@ -45,6 +47,7 @@ export const HomePage = ({
     })
       .then((response) => {
         if (response.ok) {
+          setUser(undefined);
           navigation('/login');
         } else {
           throw new Error('Failed to logout');

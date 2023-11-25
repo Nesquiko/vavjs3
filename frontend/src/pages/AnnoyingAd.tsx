@@ -52,7 +52,7 @@ export const AnnoyingAd = ({ ad, showAfterSecs, user }: AnnoyingAdProps) => {
   }, []);
 
   useEffect(() => {
-    if (adTimer === showAfterSecs && ad) {
+    if (adTimer === showAfterSecs && ad && user) {
       console.log('openneing ad at', new Date());
       setOpen(true);
     }

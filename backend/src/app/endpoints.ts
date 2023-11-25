@@ -24,7 +24,7 @@ import {
   importUserRidesFromCsv,
   saveRideEntry,
 } from './ride';
-import path from 'path';
+import morgan from 'morgan';
 
 const USER_SESSION_AGE = 1000 * 60 * 60 * 24; // 1 day
 
@@ -34,6 +34,10 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.static('dist'));
+
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('tiny'));
+}
 
 app.post('/user', async (req: Request<{}, {}, NewUserRequest>, res) => {
   try {
@@ -208,13 +212,12 @@ app.post('/admin/user/import', async (req, res) => {
   }
 });
 
-app.get('/ad', async (req, res) => {
+app.get('/ad', async (_req, res) => {
   try {
-    await checkIfLoggedIn(pool, req.cookies['sessionToken']);
     let ad = await getAd(pool);
     res.status(200).json(ad);
   } catch (e) {
-    res.status(401).json({ error: e.message });
+    res.status(500).json({ error: e.message });
   }
 });
 
@@ -255,17 +258,8 @@ async function checkIfLoggedIn(pool: Pool, token: string) {
   }
 }
 
-export function serverStart(
-  _pool: Pool,
-  port: number,
-  middleware: express.RequestHandler[],
-) {
+export function serverStart(_pool: Pool, port: number) {
   pool = _pool;
-
-  for (let m of middleware) {
-    app.use(m);
-  }
-
   let server = app.listen(port, () => {
     console.log(`Listening on port ${port}`);
   });

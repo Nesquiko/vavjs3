@@ -10,7 +10,7 @@ describe('e2e test', () => {
   let serverStop: () => Promise<void>;
 
   before(() => {
-    serverStop = startServer(parseInt(process.env.APP_PORT!), []);
+    serverStop = startServer(parseInt(process.env.APP_PORT!));
   });
 
   after(() => serverStop());
