@@ -220,12 +220,14 @@ export const AdminPage = ({ ad }: AdminPageProps) => {
               <p className="font-bold">Name: {user.name}</p>
               <p>Email: {user.email}</p>
             </div>
-            <button
-              className="bg-black text-white font-bold py-2 px-4 rounded"
-              onClick={() => handleDeleteUser(user.id)}
-            >
-              Delete
-            </button>
+            {user.name !== 'admin' && (
+              <button
+                className="bg-black text-white font-bold py-2 px-4 rounded"
+                onClick={() => handleDeleteUser(user.id)}
+              >
+                Delete
+              </button>
+            )}
           </div>
         ))}
       </div>
